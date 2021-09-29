@@ -18,6 +18,7 @@ class DBHandle {
 }
 
 public class MTwithThreadClass extends Thread {
+    // All threads should create on 1 DBHandle
     private static volatile DBHandle dbHandle = null;
 
     public MTwithThreadClass(String name) {
@@ -32,10 +33,12 @@ public class MTwithThreadClass extends Thread {
         System.out.println("dbHanle's name is : " + dbHandle.getMyName());
     }
 
-    public DBHandle getDBHandle() {
-        if (dbHandle == null) { 
+    public static DBHandle getDBHandle() {
+        if (dbHandle == null) {
             synchronized (MTwithThreadClass.class) {
                 if (dbHandle == null) {
+                    // What does this 'new' operator does : i) operator new call ( malloc , memory
+                    // allocation), ii ) constructor call
                     dbHandle = new DBHandle(Thread.currentThread().getName());
                 }
             }
@@ -46,7 +49,7 @@ public class MTwithThreadClass extends Thread {
     public static void main(String[] args) throws InterruptedException {
         System.out.println("Main Starts...");
         final int SIZE = 10;
-        
+        // If DBHandle is instantiated here. it will be Single object...
         MTwithThreadClass arrayOfThread[] = new MTwithThreadClass[SIZE];
         for (int i = 0; i < SIZE; ++i) {
             arrayOfThread[i] = new MTwithThreadClass("#" + i);
